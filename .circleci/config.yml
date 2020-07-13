@@ -99,7 +99,7 @@ jobs:
             export PATH="~/.local/bin:$PATH"
             git clone https://github.com/hashicorp/learn-terraform-circleci/ .
             pwd
-            aws s3 sync --acl public-read "/home/circleci/project/assets" s3://${CLIENT_SERVERLESS_STATE_BUCKET}
+            aws s3 sync --acl public-read "/home/circleci/project/assets" s3://${FASTAPI_SERVERLESS_TF_STATE_BUCKET}
   destroy:
     <<: *default_config
     steps:
