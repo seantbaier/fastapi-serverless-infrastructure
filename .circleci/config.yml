@@ -99,7 +99,7 @@ jobs:
             export PATH="~/.local/bin:$PATH"
             git clone https://github.com/hashicorp/learn-terraform-circleci/ .
             pwd
-            aws s3 sync --acl public-read "/home/circleci/project/assets" s3://${APP_BUCKET}
+            aws s3 sync --acl public-read "/home/circleci/project/assets" s3://${CLIENT_SERVERLESS_STATE_BUCKET}
   destroy:
     <<: *default_config
     steps:
@@ -126,19 +126,39 @@ workflows:
           context: fastapi-lambda-dev
           requires:
             - build
+          filters:
+            branches:
+              only:
+                - development
       - apply:
           context: fastapi-lambda-dev
           requires:
             - plan
+          filters:
+            branches:
+              only:
+                - development
       - deployment:
           context: fastapi-lambda-dev
           requires:
             - apply
+          filters:
+            branches:
+              only:
+                - development
       - hold:
           type: approval
           requires:
             - deployment
+          filters:
+            branches:
+              only:
+                - development
       - destroy:
           context: fastapi-lambda-dev
           requires:
             - hold
+          filters:
+            branches:
+              only:
+                - development

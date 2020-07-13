@@ -1,9 +1,10 @@
 terraform {
   backend "remote" {
+    hostname     = "app.terraform.io"
     organization = "seanbaier"
 
     workspaces {
-      name = "fastaoi-serverless-infrastructure"
+      name = "fastapi-serverless-infrastructure"
     }
   }
 }
@@ -27,7 +28,7 @@ resource "aws_iam_access_key" "circleci" {
 data "template_file" "circleci_policy" {
   template = file("circleci_s3_access.tpl.json")
   vars = {
-    s3_bucket_arn = aws_s3_bucket.portfolio.arn
+    s3_bucket_arn = aws_s3_bucket.fastapi_serverless_tf_state.arn
   }
 }
 
@@ -42,22 +43,11 @@ resource "aws_iam_user_policy" "circleci" {
   policy = data.template_file.circleci_policy.rendered
 }
 
-resource "aws_s3_bucket" "portfolio" {
+resource "aws_s3_bucket" "fastapi_serverless_tf_state" {
   tags = {
-    Name = "Portfolio Website Bucket"
+    Name = "Fastapi Serverless State Management ${var.stage}"
   }
 
-  bucket = "${var.app}.${var.label}"
-  acl    = "public-read"
-
-  website {
-    index_document = "${var.app}.html"
-    error_document = "error.html"
-  }
+  bucket        = "fastapi-serverless-tf-state-${var.stage}"
   force_destroy = true
-
-}
-
-output "Endpoint" {
-  value = aws_s3_bucket.portfolio.website_endpoint
 }
