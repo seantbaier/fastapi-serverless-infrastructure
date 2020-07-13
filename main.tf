@@ -53,13 +53,13 @@ resource "aws_s3_bucket" "fastapi_serverless" {
 }
 
 resource "aws_api_gateway_rest_api" "fastapi_api_gateway" {
-  name = "fastapi-serverless-api-gateway-${var.stage}"
+  name        = "fastapi-serverless-api-gateway-${var.stage}"
   description = "FastApi Serverless API Gateway"
 
 }
 
 resource "aws_api_gateway_resource" "fastapi_api_gateway" {
-  rest_api_id = "${aws_api_gateway_rest_api.fastapi_api_gateway.id}"
-  parent_id   = "${aws_api_gateway_rest_api.fastapi_api_gateway.root_resource_id}"
-  path_part   = "fastapi_api_gateway"
+  rest_api_id = aws_api_gateway_rest_api.fastapi_api_gateway.id
+  parent_id   = aws_api_gateway_rest_api.fastapi_api_gateway.root_resource_id
+  path_part   = "${var.stage}"
 }
