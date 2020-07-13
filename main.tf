@@ -28,7 +28,7 @@ resource "aws_iam_access_key" "circleci" {
 data "template_file" "circleci_policy" {
   template = file("circleci_s3_access.tpl.json")
   vars = {
-    s3_bucket_arn = aws_s3_bucket.fastapi_serverless_tf_state.arn
+    s3_bucket_arn = aws_s3_bucket.fastapi_serverless.arn
   }
 }
 
@@ -43,11 +43,11 @@ resource "aws_iam_user_policy" "circleci" {
   policy = data.template_file.circleci_policy.rendered
 }
 
-resource "aws_s3_bucket" "fastapi_serverless_tf_state" {
+resource "aws_s3_bucket" "fastapi_serverless" {
   tags = {
-    Name = "Fastapi Serverless State Management ${var.stage}"
+    Name = "Fastapi Serverless ${var.stage}"
   }
 
-  bucket        = "fastapi-serverless-tf-state-${var.stage}"
+  bucket        = "fastapi-serverless-${var.stage}"
   force_destroy = true
 }
