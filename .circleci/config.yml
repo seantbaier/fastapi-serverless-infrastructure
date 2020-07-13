@@ -118,6 +118,10 @@ workflows:
     jobs:
       - build:
           context: fastapi-lambda-dev
+          filters:
+            branches:
+              only:
+                - development
       - plan:
           context: fastapi-lambda-dev
           requires:
