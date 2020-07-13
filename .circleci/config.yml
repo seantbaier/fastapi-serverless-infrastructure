@@ -125,19 +125,4 @@ workflows:
             branches:
               only:
                 - development
-      - hold:
-          type: approval
-          requires:
-            - deployment
-          filters:
-            branches:
-              only:
-                - development
-      - destroy:
-          context: fastapi-lambda-dev
-          requires:
-            - hold
-          filters:
-            branches:
-              only:
-                - development
+                
