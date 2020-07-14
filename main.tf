@@ -13,9 +13,6 @@ provider "aws" {
   region = var.region
 }
 
-provider "template" {
-}
-
 resource "aws_iam_user" "circleci" {
   name = var.user
   path = "/system/"
@@ -43,23 +40,4 @@ resource "aws_iam_user_policy" "circleci" {
   policy = data.template_file.circleci_policy.rendered
 }
 
-resource "aws_s3_bucket" "fastapi_serverless" {
-  tags = {
-    Name = "Fastapi Serverless ${var.stage}"
-  }
 
-  bucket        = "fastapi-serverless-${var.stage}"
-  force_destroy = true
-}
-
-resource "aws_api_gateway_rest_api" "fastapi_api_gateway" {
-  name        = "fastapi-serverless-api-gateway-${var.stage}"
-  description = "FastApi Serverless API Gateway"
-
-}
-
-resource "aws_api_gateway_resource" "fastapi_api_gateway" {
-  rest_api_id = aws_api_gateway_rest_api.fastapi_api_gateway.id
-  parent_id   = aws_api_gateway_rest_api.fastapi_api_gateway.root_resource_id
-  path_part   = "${var.stage}"
-}
