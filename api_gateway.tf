@@ -1,8 +1,8 @@
 resource "aws_api_gateway_stage" "fastapi_agw_stage" {
-  depends_on = ["aws_cloudwatch_log_group.fastapi_agw_log_group"]
-  stage_name = "${var.stage}"
-  rest_api_id   = "${aws_api_gateway_rest_api.fastapi_gateway.id}"
-  deployment_id = "${aws_api_gateway_deployment.fastapi_deployment.id}"
+  depends_on = aws_cloudwatch_log_group.fastapi_agw_log_group
+  stage_name = var.stage
+  rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
+  deployment_id = aws_api_gateway_deployment.fastapi_deployment.id
 
   # ... other configuration ...
 }
@@ -30,8 +30,8 @@ resource "aws_api_gateway_method" "fastapi_method" {
 }
 
 resource "aws_api_gateway_method_settings" "fastapi_method_settings" {
-  rest_api_id = "${aws_api_gateway_rest_api.fastapi_gateway.id}"
-  stage_name  = "${aws_api_gateway_stage.fastapi_agw_stage.stage_name}"
+  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
+  stage_name  = aws_api_gateway_stage.fastapi_agw_stage.stage_name
   method_path = "${aws_api_gateway_resource.fastapi_resource.path_part}/${aws_api_gateway_method.fastapi_method.http_method}"
 
   settings {
