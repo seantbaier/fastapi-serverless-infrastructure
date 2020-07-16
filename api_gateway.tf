@@ -32,7 +32,7 @@ resource "aws_api_gateway_method" "fastapi_method" {
 resource "aws_api_gateway_method_settings" "fastapi_method_settings" {
   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
   stage_name  = aws_api_gateway_stage.fastapi_agw_stage.stage_name
-  method_path = "${aws_api_gateway_resource.fastapi_resource.path_part}/${aws_api_gateway_method.fastapi_method.http_method}"
+  method_path = "${aws_api_gateway_resource.fastapi_resource.path_part}/${aws_api_gateway_method.fastapi_proxy_root.http_method}"
 
   settings {
     metrics_enabled = true
