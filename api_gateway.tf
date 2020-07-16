@@ -1,5 +1,5 @@
 resource "aws_api_gateway_stage" "fastapi_agw_stage" {
-  depends_on = aws_cloudwatch_log_group.fastapi_agw_log_group
+  depends_on = [aws_cloudwatch_log_group.fastapi_agw_log_group]
   stage_name = var.stage
   rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
   deployment_id = aws_api_gateway_deployment.fastapi_deployment.id
