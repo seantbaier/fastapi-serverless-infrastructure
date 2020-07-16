@@ -74,7 +74,7 @@ resource "aws_api_gateway_deployment" "fastapi_deployment" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  stage_name  = aws_api_gateway_stage.stage_name
+  stage_name  = aws_api_gateway_stage.fastapi_agw_stage.stage_name
 }
 
 resource "aws_cloudwatch_log_group" "fastapi_agw_log_group" {
