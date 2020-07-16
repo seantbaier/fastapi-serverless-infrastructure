@@ -42,56 +42,6 @@ resource "aws_iam_role_policy_attachment" "lambda_role_attach" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_api_gateway_resource" "fastapi_resource" {
-  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  parent_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
-  path_part   = "{proxy+}"
-}
-
-resource "aws_api_gateway_method" "fastapi_method" {
-  rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id   = aws_api_gateway_resource.fastapi_resource.id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "fastapi_integration" {
-  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id = aws_api_gateway_method.fastapi_method.resource_id
-  http_method = aws_api_gateway_method.fastapi_method.http_method
-
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.fastapi_lambda.invoke_arn
-}
-
-resource "aws_api_gateway_method" "fastapi_proxy_root" {
-  rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "fastapi_integration_root" {
-  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id = aws_api_gateway_method.fastapi_proxy_root.resource_id
-  http_method = aws_api_gateway_method.fastapi_proxy_root.http_method
-
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.fastapi_lambda.invoke_arn
-}
-
-resource "aws_api_gateway_deployment" "fastapi_deployment" {
-  depends_on = [
-    aws_api_gateway_integration.fastapi_integration,
-    aws_api_gateway_integration.fastapi_integration_root,
-  ]
-
-  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  stage_name  = "dev"
-}
-
 resource "aws_lambda_permission" "fastapi_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
