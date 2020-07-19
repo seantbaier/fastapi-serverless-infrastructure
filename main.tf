@@ -50,7 +50,7 @@ data "template_file" "circleci_policy" {
 
   vars = {
     s3_bucket_arn = module.aws_s3_bucket.arn
-    lambda_arn    = module.aws_lambda_function.invoke_arn
+    lambda_arn    = module.aws_lambda_function.lambda_arn
   }
 }
 
