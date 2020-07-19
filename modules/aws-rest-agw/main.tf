@@ -1,6 +1,6 @@
 resource "aws_api_gateway_stage" "fastapi_agw_stage" {
-  depends_on = [aws_cloudwatch_log_group.fastapi_agw_log_group]
-  stage_name = var.stage
+  depends_on    = [aws_cloudwatch_log_group.fastapi_agw_log_group]
+  stage_name    = var.stage
   rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
   deployment_id = aws_api_gateway_deployment.fastapi_deployment.id
 
@@ -10,10 +10,6 @@ resource "aws_api_gateway_stage" "fastapi_agw_stage" {
 resource "aws_api_gateway_rest_api" "fastapi_gateway" {
   name        = "fastapi-serverless-api-gateway-${var.stage}"
   description = "FastApi Serverless API Gateway"
-}
-
-output "base_url" {
-  value = aws_api_gateway_deployment.fastapi_deployment.invoke_url
 }
 
 resource "aws_api_gateway_resource" "fastapi_resource" {
@@ -47,7 +43,7 @@ resource "aws_api_gateway_integration" "fastapi_integration" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.fastapi_lambda.invoke_arn
+  uri                     = var.invoke_arn
 }
 
 resource "aws_api_gateway_method" "fastapi_proxy_root" {
@@ -64,7 +60,7 @@ resource "aws_api_gateway_integration" "fastapi_integration_root" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.fastapi_lambda.invoke_arn
+  uri                     = var.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "fastapi_deployment" {
