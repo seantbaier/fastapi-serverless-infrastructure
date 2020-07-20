@@ -8,8 +8,9 @@ resource "aws_lambda_function" "fastapi_lambda" {
   # "main" is the filename within the zip file (main.js) and "handler"
   # is the name of the property under which the handler function was
   # exported in that file.
-  handler = "main.handler"
+  handler = "app.main.handler"
   runtime = "python3.7"
+  timeout = 300
 
   role = aws_iam_role.lambda_exec.arn
 

@@ -1,10 +1,8 @@
 resource "aws_api_gateway_stage" "fastapi_agw_stage" {
-  depends_on    = [aws_cloudwatch_log_group.fastapi_agw_log_group]
+  # depends_on    = [aws_cloudwatch_log_group.fastapi_agw_log_group]
   stage_name    = var.stage
   rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
   deployment_id = aws_api_gateway_deployment.fastapi_deployment.id
-
-  # ... other configuration ...
 }
 
 resource "aws_api_gateway_rest_api" "fastapi_gateway" {
@@ -31,8 +29,9 @@ resource "aws_api_gateway_method_settings" "fastapi_method_settings" {
   method_path = "*/*"
 
   settings {
-    metrics_enabled = true
-    logging_level   = "INFO"
+    metrics_enabled    = true
+    data_trace_enabled = true
+    logging_level      = "INFO"
   }
 }
 
@@ -46,34 +45,61 @@ resource "aws_api_gateway_integration" "fastapi_integration" {
   uri                     = var.invoke_arn
 }
 
-resource "aws_api_gateway_method" "fastapi_proxy_root" {
-  rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
+# resource "aws_api_gateway_method" "fastapi_proxy_root" {
+#   rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
+#   resource_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
+#   http_method   = "ANY"
+#   authorization = "NONE"
+# }
 
-resource "aws_api_gateway_integration" "fastapi_integration_root" {
-  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-  resource_id = aws_api_gateway_method.fastapi_proxy_root.resource_id
-  http_method = aws_api_gateway_method.fastapi_proxy_root.http_method
+# resource "aws_api_gateway_integration" "fastapi_integration_root" {
+#   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
+#   resource_id = aws_api_gateway_method.fastapi_proxy_root.resource_id
+#   http_method = aws_api_gateway_method.fastapi_proxy_root.http_method
 
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = var.invoke_arn
-}
+#   integration_http_method = "POST"
+#   type                    = "AWS_PROXY"
+#   uri                     = var.invoke_arn
+# }
 
 resource "aws_api_gateway_deployment" "fastapi_deployment" {
   depends_on = [
     aws_api_gateway_integration.fastapi_integration,
-    aws_api_gateway_integration.fastapi_integration_root,
+    # aws_api_gateway_integration.fastapi_integration_root,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
   stage_name  = "dev"
 }
 
-resource "aws_cloudwatch_log_group" "fastapi_agw_log_group" {
-  name              = "Fastapi-Gateway-Execution-Logs_${aws_api_gateway_rest_api.fastapi_gateway.id}/${var.stage}"
-  retention_in_days = 7
+# resource "aws_cloudwatch_log_group" "fastapi_agw_log_group" {
+#   name              = "Fastapi-Gateway-Execution-Logs_${aws_api_gateway_rest_api.fastapi_gateway.id}/${var.stage}"
+#   retention_in_days = 7
+# }
+
+# IAM role which dictates what other AWS services the API Gateway may access.
+resource "aws_iam_role" "agw_log_role" {
+  name = "fastapi-agw-log-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_role_policy_attachment" "agw_role_attach" {
+  role       = aws_iam_role.agw_log_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
