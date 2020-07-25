@@ -45,22 +45,22 @@ resource "aws_api_gateway_integration" "fastapi_integration" {
   uri                     = var.invoke_arn
 }
 
-# resource "aws_api_gateway_method" "fastapi_proxy_root" {
-#   rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
-#   resource_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
-#   http_method   = "ANY"
-#   authorization = "NONE"
-# }
+resource "aws_api_gateway_method" "fastapi_proxy_root" {
+  rest_api_id   = aws_api_gateway_rest_api.fastapi_gateway.id
+  resource_id   = aws_api_gateway_rest_api.fastapi_gateway.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "fastapi_integration_root" {
-#   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
-#   resource_id = aws_api_gateway_method.fastapi_proxy_root.resource_id
-#   http_method = aws_api_gateway_method.fastapi_proxy_root.http_method
+resource "aws_api_gateway_integration" "fastapi_integration_root" {
+  rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
+  resource_id = aws_api_gateway_method.fastapi_proxy_root.resource_id
+  http_method = aws_api_gateway_method.fastapi_proxy_root.http_method
 
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = var.invoke_arn
-# }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.invoke_arn
+}
 
 resource "aws_api_gateway_deployment" "fastapi_deployment" {
   depends_on = [
@@ -71,11 +71,6 @@ resource "aws_api_gateway_deployment" "fastapi_deployment" {
   rest_api_id = aws_api_gateway_rest_api.fastapi_gateway.id
   stage_name  = "dev"
 }
-
-# resource "aws_cloudwatch_log_group" "fastapi_agw_log_group" {
-#   name              = "Fastapi-Gateway-Execution-Logs_${aws_api_gateway_rest_api.fastapi_gateway.id}/${var.stage}"
-#   retention_in_days = 7
-# }
 
 # IAM role which dictates what other AWS services the API Gateway may access.
 resource "aws_iam_role" "agw_log_role" {
